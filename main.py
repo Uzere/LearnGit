@@ -17,15 +17,23 @@ def setUpWorkspace():
 	os.chdir("myfirstrepo")
 
 
+def commandInput():
+	s = input()
+	
 
 
 resetProgress()
 
 setUpWorkspace()
 
-
 # Our terminal prompt below is currently in an octobox directory. To initialize a Git repository here, type the following command:
 # git init
+print("""Мы находимся в почти-настоящем-терминале в папке myfirstrepo.
+И нам нужно создать здесь новый git репозиторий.
+Для этого нужно просто ввести команду: git init
+""")
+
+commandInput()
 
 # Good job! As Git just told us, our octobox directory now has an empty repository in /.git/. The repository is a hidden directory where Git operates.
 # Next up, let's type the git status command to see what the current state of our project is:
