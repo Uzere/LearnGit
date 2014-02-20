@@ -1,5 +1,5 @@
 #!python3
-import os, subprocess, shutil
+import os, subprocess, shutil, shlex, codecs
 
 
 def resetProgress():
@@ -7,6 +7,7 @@ def resetProgress():
 		shutil.rmtree("myfirstrepo")  # hope no rm -rm /*
 	except:
 		pass  # seems there's no repo
+
 
 def setUpWorkspace():
 	try:
@@ -17,32 +18,94 @@ def setUpWorkspace():
 	os.chdir("myfirstrepo")
 
 
+baseDir = os.getcwd()
 def commandInput():
-	s = input()
-	
+	s = input(os.getcwd().replace(baseDir, "")[1:]+">")
+	t = shlex.split(s)
+	out = "error"
+	try:
+		out = subprocess.check_output(t, shell=True)
+		try:
+			out = codecs.decode(out)
+		except:
+			out = codecs.decode(out, 'cp866', 'ignore')
+		print(out)
+	except:
+		print(t)
+		print("Something going wrong")
+
+	return (t, out)
+
+
+def lesson2hook():
+	f = open("octocat.txt", "w").write("gsom pew pew")
+	f.close(f)
+
+
+lessons = [
+
+(
+"""Мы находимся в почти-настоящем-терминале в папке myfirstrepo.
+И нам нужно создать здесь новый git репозиторий.
+Для этого нужно просто ввести команду: git init
+""",
+lambda it, ot: "git" in it and "init" in it and "Initialized" in ot
+), 
+
+(
+"""Отлично! Как сказал Git, наша папка myfirstrepo теперь содержит пустой репозиторий в папке /.git/. Это скрытая папка, где Git хранит все свои файлы.
+Можно посмотреть список файлов в текущей папке с помощью команды dir. Эту команду можно использовать в любой момент.
+Далее, введём команду git status и посмотрим текущее состояние нашего проекта.
+""",
+lambda it, ot: "git" in it and "status" in it and "On branch" in ot
+),
+
+(
+"""Я создал файл octocat.txt в нашем репозитории (Его можно увидеть с помощью команды dir).
+Снова выполни команду git status чтобы посмотреть что изменилось.
+""",
+lambda it, ot: "git" in it and "status" in it and "On branch" in ot,
+lesson2hook
+)
+
+
+]
 
 
 resetProgress()
 
 setUpWorkspace()
 
-# Our terminal prompt below is currently in an octobox directory. To initialize a Git repository here, type the following command:
-# git init
-print("""Мы находимся в почти-настоящем-терминале в папке myfirstrepo.
-И нам нужно создать здесь новый git репозиторий.
-Для этого нужно просто ввести команду: git init
-""")
 
-commandInput()
+lesson = 0
+while lesson<len(lessons):
+	print(lessons[lesson][0])
+	while True:
+		it, ot = commandInput()
 
-# Good job! As Git just told us, our octobox directory now has an empty repository in /.git/. The repository is a hidden directory where Git operates.
-# Next up, let's type the git status command to see what the current state of our project is:
-# git status
+		try:
+			lessons[lesson][2]()
+		except:
+			pass
+		
+		suc = False
+		if "dir"==it[0]:
+			pass
+		elif lessons[lesson][1](it, ot):
+			# print("PROFIT")
+			suc = True
+		else:
+			print("Что-то не так, попробуй ещё раз")
+
+		if suc:
+			break
+	lesson+=1
+
+print("Нет больше уроков")
+
 
 # - add file
-# I created a file called octocat.txt in the octobox repository for you (as you can see in the browser below).
-# You should run the git status command again to see how the repository status has changed:
-# git status
+# 
 
 # Good, it looks like our Git repository is working properly. Notice how Git says octocat.txt is "untracked"? That means Git sees that octocat.txt is a new file.
 # To tell Git to start tracking changes made to octocat.txt, we first need to add it to the staging area by using git add.
