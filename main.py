@@ -3,6 +3,9 @@ import os, subprocess, shutil, shlex, codecs
 
 
 def resetProgress():
+	"""
+	Удаляет результаты предыдущих запусков
+	"""
 	try:
 		shutil.rmtree("myfirstrepo")  # hope no rm -rm /*
 	except:
@@ -10,6 +13,9 @@ def resetProgress():
 
 
 def setUpWorkspace():
+	"""
+	Создаёт папку и устанавливает её как текущую
+	"""
 	try:
 		os.mkdir("myfirstrepo")
 	except:
@@ -19,10 +25,16 @@ def setUpWorkspace():
 
 
 baseDir = os.getcwd()
+
+
 def commandInput():
+	"""
+	Получает команду, запускает и получает вывод 
+	"""
 	s = input(os.getcwd().replace(baseDir, "")[1:]+">")
 	t = shlex.split(s)
 	out = "error"
+
 	try:
 		out = subprocess.check_output(t, shell=True)
 		try:
@@ -30,6 +42,7 @@ def commandInput():
 		except:
 			out = codecs.decode(out, 'cp866', 'ignore')
 		print(out)
+
 	except:
 		print(t)
 		print("Something going wrong")
@@ -38,8 +51,11 @@ def commandInput():
 
 
 def lesson2hook():
-	f = open("octocat.txt", "w").write("gsom pew pew")
-	f.close(f)
+	"""
+	Создаёт файл, нужный для второго (с 0) урока
+	"""
+	with open("reallynewfile.txt", "w") as f:
+		f.write("42 is the answer to life the universe and everything")
 
 
 lessons = [
@@ -54,14 +70,14 @@ lambda it, ot: "git" in it and "init" in it and "Initialized" in ot
 
 (
 """Отлично! Как сказал Git, наша папка myfirstrepo теперь содержит пустой репозиторий в папке /.git/. Это скрытая папка, где Git хранит все свои файлы.
-Можно посмотреть список файлов в текущей папке с помощью команды dir. Эту команду можно использовать в любой момент.
+Можно посмотреть список файлов в текущей папке с помощью команды dir или dir /a чтобы увидеть и скрытые файлы. Эту команду можно использовать в любой момент.
 Далее, введём команду git status и посмотрим текущее состояние нашего проекта.
 """,
 lambda it, ot: "git" in it and "status" in it and "On branch" in ot
 ),
 
 (
-"""Я создал файл octocat.txt в нашем репозитории (Его можно увидеть с помощью команды dir).
+"""Я создал файл reallynewfile.txt в нашем репозитории (Его можно увидеть с помощью команды dir).
 Снова выполни команду git status чтобы посмотреть что изменилось.
 """,
 lambda it, ot: "git" in it and "status" in it and "On branch" in ot,
@@ -81,13 +97,13 @@ lesson = 0
 while lesson<len(lessons):
 	print(lessons[lesson][0])
 	while True:
-		it, ot = commandInput()
-
 		try:
 			lessons[lesson][2]()
-		except:
+		except IndexError:
 			pass
 		
+		it, ot = commandInput()
+
 		suc = False
 		if "dir"==it[0]:
 			pass
@@ -103,9 +119,6 @@ while lesson<len(lessons):
 
 print("Нет больше уроков")
 
-
-# - add file
-# 
 
 # Good, it looks like our Git repository is working properly. Notice how Git says octocat.txt is "untracked"? That means Git sees that octocat.txt is a new file.
 # To tell Git to start tracking changes made to octocat.txt, we first need to add it to the staging area by using git add.
