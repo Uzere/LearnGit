@@ -1,10 +1,12 @@
 #!python3
 import sys, os, subprocess, codecs
 import shutil, shlex
-from ctypes import windll
 
-STD_OUTPUT_HANDLE = -11
-stdout_handle = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+if os.name == 'nt':
+	from ctypes import windll
+	STD_OUTPUT_HANDLE = -11
+	stdout_handle = windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+
 
 DEFAULT, COMMAND, GREEN, RED = 7, 11, 10, 12
 COLORS = {
@@ -15,7 +17,10 @@ COLORS = {
 }
 
 def setColor(color):
-	windll.kernel32.SetConsoleTextAttribute(stdout_handle, color)
+	if os.name == 'nt':
+		windll.kernel32.SetConsoleTextAttribute(stdout_handle, color)
+	else:
+		pass
 
 def colorPrint(s):
 	a = s.split('$')
@@ -63,7 +68,11 @@ def commandInput():
 	out = "error"
 
 	try:
-		out = subprocess.check_output(t, shell=True)
+		if os.name == 'nt':
+			out = subprocess.check_output(t, shell=True)
+		else:
+			out = subprocess.check_output(" ".join(t), shell=True)
+
 		try:
 			out = codecs.decode(out)
 		except:
@@ -71,10 +80,12 @@ def commandInput():
 		setColor(DEFAULT)
 		print(out)
 
-	except:
-		print(t)
-		setColor(RED)
-		print("Something going wrong")
+	except Exception as e:
+		#if e.returncode!=1:
+			print("TTT", t)
+			print("EEE", e)
+			setColor(RED)
+			print("Something going wrong")
 
 	return (t, out)
 
@@ -94,7 +105,7 @@ lessons = [
 И нам нужно создать здесь новый git репозиторий.
 Для этого нужно просто ввести команду: $~c$git init$~d$
 """,
-lambda it, ot: "git" in it and "init" in it and "Initialized" in ot
+lambda it, ot: "git" in it and "init" in it and ("Initialized" in ot or "Инициализированный" in ot)
 ), 
 
 (
@@ -102,14 +113,14 @@ lambda it, ot: "git" in it and "init" in it and "Initialized" in ot
 Можно посмотреть список файлов в текущей папке с помощью команды $~c$dir$~d$ или $~c$dir /a$~d$ чтобы увидеть и скрытые файлы. Эту команду можно использовать в любой момент.
 Далее, введём команду $~c$git status$~d$ и посмотрим текущее состояние нашего проекта.
 """,
-lambda it, ot: "git" in it and "status" in it and "On branch" in ot
+lambda it, ot: "git" in it and "status" in it and ("On branch" in ot or "В ветке" in ot)
 ),
 
 (
 """Я создал файл $~c$reallynewfile.txt$~d$ в нашем репозитории (Его можно увидеть с помощью команды $~c$dir$~d$).
 Снова выполни команду $~c$git status$~d$ чтобы посмотреть что изменилось.
 """,
-lambda it, ot: "git" in it and "status" in it and "On branch" in ot,
+lambda it, ot: "git" in it and "status" in it and ("On branch" in ot or "В ветке" in ot),
 lesson2hook
 )
 
