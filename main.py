@@ -129,8 +129,21 @@ lambda it, ot: "git" in it and "status" in it and ("On branch" in ot or "В ве
 """,
 lambda it, ot: "git" in it and "status" in it and ("On branch" in ot or "В ветке" in ot),
 lesson2hook
-)
+),
 
+(
+"""Кажется, наш репозиторий работает правильно. Git говорит что $~c$reallynewfile.txt$~d$ - неотслеживаемый ($~c$untracked$~d$), значит Git обнаружил новый файл.
+Чтобы Git начал отслеживать изменения в этом файле, нужно его проиндексировать ($~c$stage$~d$) с помощью команды $~c$git add reallynewfile.txt$~d$
+""",
+lambda it, ot: "git" in it and "add" in it
+),
+
+(
+"""Отлично, git теперь следит за изменениями в файле $~c$reallynewfile.txt$~d$. 
+Чтобы посмотреть текущее состояние, используем команду $~c$git status$~d$.
+""",
+lambda it, ot: "git" in it and "status" in it and ("On branch" in ot or "В ветке" in ot)
+)
 
 ]
 
@@ -155,6 +168,8 @@ while lesson<len(lessons):
 		suc = False
 		if "dir"==it[0]:
 			pass
+		elif "ls"==it[0]:
+			pass
 		elif lessons[lesson][1](it, ot):
 			suc = True
 		else:
@@ -172,12 +187,6 @@ print("Нет больше уроков")
 setColor(DEFAULT)
 
 
-# Good, it looks like our Git repository is working properly. Notice how Git says octocat.txt is "untracked"? That means Git sees that octocat.txt is a new file.
-# To tell Git to start tracking changes made to octocat.txt, we first need to add it to the staging area by using git add.
-# git add octocat.txt
-
-# Good job! Git is now tracking our octocat.txt file. Let's run git status again to see where we stand:
-# git status
 
 # Notice how Git says changes to be committed? The files listed here are in the Staging Area, and they are not in our repository yet. We could add or remove files from the stage before we store them in the repository.
 # To store our staged changes we run the commit command with a message describing what we've changed. Let's do that now by typing:
