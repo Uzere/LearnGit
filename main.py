@@ -16,11 +16,18 @@ COLORS = {
 	'r': RED
 }
 
+LIN_COLORS = {
+	DEFAULT: '\033[0m',
+	COMMAND: '\033[94m',
+	GREEN: '\033[92m',
+	RED: '\033[91m'
+}
+
 def setColor(color):
 	if os.name == 'nt':
 		windll.kernel32.SetConsoleTextAttribute(stdout_handle, color)
 	else:
-		pass
+		print(LIN_COLORS[color], end="")
 
 def colorPrint(s):
 	a = s.split('$')
